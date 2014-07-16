@@ -40,30 +40,32 @@ exports.hashAndSub = function(grunt, options) {
         return path.dirname(src);
       }));
     });
-    var commonpath = utils.findCommonPath(mergedFilePaths);
+    var commonpath = options.root || utils.findCommonPath(mergedFilePaths);
     grunt.log.debug('common path: ' + commonpath);
 
     options.files.forEach(function(f) {
       f.src.forEach(function(src) {
         var md5        = utils.md5(src).slice(0, 8),
             fileName   = path.basename(src),
-            filePath   = path.dirname(src).replace(commonpath, '').replace(/^\//g, ''), // remove slashes at beginning
+            filePath   = path.dirname(src).replace(commonpath, ''),
             key        = path.join(filePath, fileName),
             lastIndex  = fileName.lastIndexOf('.'),
             renamed    = formatter({
               hash: md5,
               name: fileName.slice(0, lastIndex),
-              ext : fileName.slice(lastIndex + 1, fileName.length)
+              ext : fileName.slice(lastIndex + 1, fileName.length),
+              path: filePath
             }),
             nameSearch = searchFormatter({
               hash: /[0-9a-f]{8}/,
               name: fileName.slice(0, lastIndex),
-              ext: fileName.slice(lastIndex + 1, fileName.length)
+              ext: fileName.slice(lastIndex + 1, fileName.length),
+              path: filePath
             });
 
         // Mapping the original name with hashed one for later use.
-        nameToHashedName[key] = path.join(filePath, renamed);
-        nameToNameSearch[key] = path.join(filePath, nameSearch);
+        nameToHashedName[key] = renamed;
+        nameToNameSearch[key] = nameSearch;
 
         // Renaming the file
         if (renameFiles) {
@@ -87,18 +89,22 @@ exports.hashAndSub = function(grunt, options) {
 
       // Substituting references to the given files with the hashed ones.
       grunt.file.expand(f.dest).forEach(function(f) {
+        grunt.log.subhead(f);
         var destContents = fs.readFileSync(f, encoding);
         files.forEach(function(value) {
           grunt.log.debug('Substituting ' + value[0] + ' by ' + value[1]);
-          destContents = destContents.replace(new RegExp(utils.preg_quote(value[0])+"(\\?[0-9a-z]+)?", "g"), value[1]);
+          destContents = destContents.replace(new RegExp(utils.preg_quote(value[0])+"(\\?[0-9a-z]+)?", "g"), function () {
+            grunt.log.write(value[0] + ' ').ok(value[1]);
+            return value[1];
+          });
 
-          grunt.log.debug('Substituting ' + nameToNameSearch[value[0]] + ' by ' + value[1]);
-          destContents = destContents.replace(
-                new RegExp(nameToNameSearch[value[0]], "g"),
-                value[1]
-            );
+          // grunt.log.debug('Substituting ' + nameToNameSearch[value[0]] + ' by ' + value[1]);
+          // destContents = destContents.replace(
+          //       new RegExp(nameToNameSearch[value[0]], "g"),
+          //       value[1]
+          //   );
         });
-        grunt.log.debug('Saving the updated contents of the outination file');
+        grunt.log.debug('Saving the updated contents of the destination file');
         fs.writeFileSync(f, destContents, encoding);
       });
     });

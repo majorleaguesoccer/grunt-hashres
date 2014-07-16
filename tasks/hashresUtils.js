@@ -41,6 +41,7 @@ exports.compileFormat = function(format) {
     var output = format.replace(/\$\{hash\}/g, options.hash);
     output = output.replace(/\$\{name\}/g, options.name);
     output = output.replace(/\$\{ext\}/g, options.ext);
+    output = output.replace(/\$\{path\}/g, options.path);
     return output;
   };
 };
@@ -53,6 +54,7 @@ exports.compileSearchFormat = function(format) {
     var output = format.split('\\$\\{hash\\}').join(escapeNonRegex(options.hash));
     output = output.split('\\$\\{name\\}').join(escapeNonRegex(options.name));
     output = output.split('\\$\\{ext\\}').join(escapeNonRegex(options.ext));
+    output = output.split('\\$\\{path\\}').join(escapeNonRegex(options.path));
     return output;
   };
 };

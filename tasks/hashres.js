@@ -30,7 +30,8 @@ module.exports = function(grunt) {
       dest          : options.dest,
       encoding      : options.encoding,
       fileNameFormat: options.fileNameFormat,
-      renameFiles   : options.renameFiles
+      renameFiles   : options.renameFiles,
+      root          : options.root
     });
   });
 
