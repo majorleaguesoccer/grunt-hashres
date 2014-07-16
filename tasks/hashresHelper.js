@@ -69,7 +69,7 @@ exports.hashAndSub = function(grunt, options) {
 
         // Renaming the file
         if (renameFiles) {
-          fs.renameSync(src, path.resolve(path.dirname(src), renamed));
+          fs.renameSync(src, path.resolve(path.dirname(src), path.basename(renamed)));
         }
         grunt.log.write(src + ' ').ok(renamed);
       });
