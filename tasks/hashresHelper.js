@@ -99,9 +99,9 @@ exports.hashAndSub = function(grunt, options) {
           });
 
           grunt.log.debug('Substituting ' + value[0] + ' by ' + value[1]);
-          destContents = destContents.replace(new RegExp('([\'"])' + utils.preg_quote(value[0])+'(\\?[0-9a-z]+)?([\'"])', 'g'), function (match, p1, p2, p3) {
+          destContents = destContents.replace(new RegExp('([\'"])' + utils.preg_quote(value[0]) + '([\'"])', 'g'), function (match, p1, p2) {
             grunt.log.write(value[0] + ' ').ok(value[1]);
-            return p1 + value[1] + p3;
+            return p1 + value[1] + p2;
           });
         });
         grunt.log.debug('Saving the updated contents of the destination file');
