@@ -91,15 +91,16 @@ exports.hashAndSub = function(grunt, options) {
       grunt.file.expand(f.dest).forEach(function(f) {
         grunt.log.subhead(f);
         var destContents = fs.readFileSync(f, encoding);
+        var delimRegex = '([\'"]' + (options.requireQuotes ? '' : '?') + ')';
         files.forEach(function(value) {
           grunt.log.debug('Substituting ' + nameToNameSearch[value[0]] + ' by ' + value[1]);
-          destContents = destContents.replace(new RegExp('([\'"])' + nameToNameSearch[value[0]] + '([\'"])', "g"), function (match, p1, p2) {
+          destContents = destContents.replace(new RegExp(delimRegex + nameToNameSearch[value[0]] + delimRegex, "g"), function (match, p1, p2) {
             grunt.log.write(nameToNameSearch[value[0]] + ' ').ok(value[1]);
             return p1 + value[1] + p2;
           });
 
           grunt.log.debug('Substituting ' + value[0] + ' by ' + value[1]);
-          destContents = destContents.replace(new RegExp('([\'"])' + utils.preg_quote(value[0]) + '([\'"])', 'g'), function (match, p1, p2) {
+          destContents = destContents.replace(new RegExp(delimRegex + utils.preg_quote(value[0]) + delimRegex, 'g'), function (match, p1, p2) {
             grunt.log.write(value[0] + ' ').ok(value[1]);
             return p1 + value[1] + p2;
           });
